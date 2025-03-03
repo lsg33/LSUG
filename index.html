@@ -188,10 +188,10 @@
     </div>
   </div>
 
-  <!-- Firebase JS Config and Initialization -->
- <script type="module">
-  // Import Firebase SDKs
+<script type="module">
+  // Import the functions you need from the Firebase SDKs
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
   import { getFirestore } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
@@ -208,12 +208,14 @@
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);  // Initialize Firebase Authentication
+  const db = getFirestore(app);  // Initialize Firestore
 
-  // Handle user authentication
+  // Check if the user is authenticated
   auth.onAuthStateChanged((user) => {
     if (user) {
+      // User is signed in
       db.collection("students").doc(user.uid).get().then((doc) => {
         if (doc.exists) {
           document.getElementById("loginModal").style.display = "none";
@@ -223,7 +225,7 @@
         }
       });
     } else {
-      // Use signInAnonymously explicitly from the new import
+      // If no user is signed in, sign in anonymously
       signInAnonymously(auth)
         .then(() => {
           console.log("Anonymous user signed in.");
@@ -234,7 +236,7 @@
     }
   });
 
-  // Login function
+  // Login function to save student name to Firestore
   window.loginStudent = function() {
     const name = document.getElementById("studentName").value;
     if (name.trim() === "") return alert("Enter your name!");
@@ -249,17 +251,18 @@
     });
   }
 
-  // Sidebar toggle
+  // Sidebar toggle function
   window.toggleSidebar = function() {
     document.getElementById("sidebar").classList.toggle("open-sidebar");
   }
 
-  // Show tab function
+  // Function to show specific tabs
   window.showTab = function(tabName) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
     document.getElementById(tabName).classList.remove("hidden");
   }
 </script>
+
 
 </body>
 </html>
