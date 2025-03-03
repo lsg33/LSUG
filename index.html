@@ -6,10 +6,6 @@
   <title>Game Hub</title>
 
   <!-- Firebase Scripts -->
-<!-- Firebase Scripts (via CDN, from Google) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
 
   <!-- Styles -->
@@ -170,11 +166,11 @@
     <div id="games" class="tab-content">
       <div class="game-grid">
         <div class="game-card" onclick="requestPlaytime('Game 1')">
-          <img src="placeholder.png" alt="Game 1">
+          <img src="https://via.placeholder.com/120x80" alt="Game 1">
           <p>Game 1</p>
         </div>
         <div class="game-card" onclick="requestPlaytime('Game 2')">
-          <img src="placeholder.png" alt="Game 2">
+          <img src="https://via.placeholder.com/120x80" alt="Game 1">
           <p>Game 2</p>
         </div>
       </div>
@@ -196,8 +192,21 @@
   </div>
 
   <!-- Firebase JS Config and Initialization -->
-  <script>
-  const firebaseConfig = {
+ 
+
+
+
+
+
+  <!-- Firebase Scripts (via CDN, from Google) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<!-- Firebase Initialization -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const firebaseConfig = {
       apiKey: "AIzaSyC3OKNqd-r8Hvsk8F7TxlAuNKI0--9bm4k",
       authDomain: "lsug-a702f.firebaseapp.com",
       projectId: "lsug-a702f",
@@ -205,10 +214,10 @@
       messagingSenderId: "217408526353",
       appId: "1:217408526353:web:2273f6d96adc60814339b0",
       measurementId: "G-06K8D9D3Y3"
-  };
+    };
   
-  firebase.initializeApp(firebaseConfig);
-
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
 
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -242,7 +251,7 @@
       });
     }
 
-    function toggleSidebar() {
+        function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("open-sidebar");
     }
 
@@ -250,7 +259,11 @@
       document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
       document.getElementById(tabName).classList.remove("hidden");
     }
-  </script>
+
+    window.loginStudent = loginStudent;
+  });
+</script>
+
 
 </body>
 </html>
