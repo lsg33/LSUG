@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Game Hub</title>
 
-  <!-- Firebase Scripts -->
-
-
   <!-- Styles -->
   <style>
     body {
@@ -192,18 +189,13 @@
   </div>
 
   <!-- Firebase JS Config and Initialization -->
- 
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-
-
-<!-- Firebase Scripts (v8 for compatibility with script tags) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<!-- Firebase Initialization -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
+    // Your Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyC3OKNqd-r8Hvsk8F7TxlAuNKI0--9bm4k",
       authDomain: "lsug-a702f.firebaseapp.com",
@@ -215,11 +207,11 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
+    // Handle user authentication
     auth.onAuthStateChanged((user) => {
       if (user) {
         db.collection("students").doc(user.uid).get().then((doc) => {
@@ -235,7 +227,8 @@
       }
     });
 
-    function loginStudent() {
+    // Login function
+    window.loginStudent = function() {
       const name = document.getElementById("studentName").value;
       if (name.trim() === "") return alert("Enter your name!");
 
@@ -249,22 +242,17 @@
       });
     }
 
-    function toggleSidebar() {
+    // Sidebar toggle
+    window.toggleSidebar = function() {
       document.getElementById("sidebar").classList.toggle("open-sidebar");
     }
 
-    function showTab(tabName) {
+    // Show tab function
+    window.showTab = function(tabName) {
       document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
       document.getElementById(tabName).classList.remove("hidden");
     }
-
-    window.loginStudent = loginStudent;
-    window.toggleSidebar = toggleSidebar;
-    window.showTab = showTab;
-  });
-</script>
-
-
+  </script>
 
 </body>
 </html>
