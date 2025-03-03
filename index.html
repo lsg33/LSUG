@@ -196,12 +196,10 @@
 
 
 
-
-
-  <!-- Firebase Scripts (via CDN, from Google) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<!-- Firebase Scripts (v8 for compatibility with script tags) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <!-- Firebase Initialization -->
 <script>
@@ -215,7 +213,7 @@
       appId: "1:217408526353:web:2273f6d96adc60814339b0",
       measurementId: "G-06K8D9D3Y3"
     };
-  
+
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
@@ -251,7 +249,7 @@
       });
     }
 
-        function toggleSidebar() {
+    function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("open-sidebar");
     }
 
@@ -261,8 +259,11 @@
     }
 
     window.loginStudent = loginStudent;
+    window.toggleSidebar = toggleSidebar;
+    window.showTab = showTab;
   });
 </script>
+
 
 
 </body>
