@@ -48,8 +48,10 @@
       <input type="text" id="lastName" placeholder="Last Name" required><br>
       <input type="email" id="email" placeholder="Email" required><br>
       <button type="submit">Sign Up</button>
+      
     </form>
     <p id="errorMessage" style="color:red;"></p>
+    <p style="color:green;" onclick="loginPage()">Have an account already?</p>    
   </div>
 
   <script>
@@ -60,8 +62,8 @@
       const email = document.getElementById('email').value;
 
       // Email validation check
-      if (!email.endsWith('@certaindomail.com')) {
-        document.getElementById('errorMessage').innerText = 'Sorry, your email must end with @certaindomail.com';
+      if (!email.endsWith('@jccschools.net')) {
+        document.getElementById('errorMessage').innerText = 'Sorry, your email must end with @jccschools.net';
         return;
       }
 
@@ -81,6 +83,10 @@
         document.getElementById('errorMessage').innerText = data.message;
       }
     });
+
+  function loginPage() {
+    window.location.href = '/login';  // Redirect to the login page
+  }
   </script>
 
 </body>
