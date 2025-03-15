@@ -6,85 +6,85 @@
   <title>Register</title>
   <style>
    body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f7fa;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-.form-container {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 100%;
-  max-width: 400px;
-  box-sizing: border-box; /* Prevent the width from exceeding the container */
-}
+  .form-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box; /* Prevent the width from exceeding the container */
+  }
 
-h2 {
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-}
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
 
-input {
-  width: calc(100% - 24px); 
-  padding: 12px;
-  margin: 10px 0;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  background-color: #f9f9f9;
-  transition: border-color 0.3s;
-  box-sizing: border-box; /* Include padding in the element’s total width */
-}
+  input {
+    width: calc(100% - 24px); 
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+    box-sizing: border-box; /* Include padding in the element’s total width */
+  }
 
-input:focus {
-  border-color: #007BFF;
-  outline: none;
-}
+  input:focus {
+    border-color: #007BFF;
+    outline: none;
+  }
 
-button {
-  width: calc(100% - 24px); /* Same width as inputs */
-  padding: 12px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-sizing: border-box; /* Prevent the width from exceeding the container */
-}
+  button {
+    width: calc(100% - 24px); /* Same width as inputs */
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box; /* Prevent the width from exceeding the container */
+  }
 
-button:hover {
-  background-color: #0056b3;
-}
+  button:hover {
+    background-color: #0056b3;
+  }
 
-.error-message {
-  color: red;
-  margin-top: 10px;
-  font-size: 14px;
-}
+  .error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+  }
 
-.footer-text {
-  color: green;
-  margin-top: 15px;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 14px;
-}
+  .footer-text {
+    color: green;
+    margin-top: 15px;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+  }
 
-.footer-text:hover {
-  color: #007BFF;
-}
+  .footer-text:hover {
+    color: #007BFF;
+  }
 
   </style>
 </head>
@@ -96,6 +96,7 @@ button:hover {
       <input type="text" id="firstName" placeholder="First Name" required><br>
       <input type="text" id="lastName" placeholder="Last Name" required><br>
       <input type="email" id="email" placeholder="Email" required><br>
+      <input type="password" id="password" placeholder="Password" required><br> <!-- Password input -->
       <button type="submit">Sign Up</button>
     </form>
     <p id="errorMessage" class="error-message"></p>
@@ -108,10 +109,17 @@ button:hover {
       const firstName = document.getElementById('firstName').value;
       const lastName = document.getElementById('lastName').value;
       const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value; // Get password value
 
       // Email validation check
       if (!email.endsWith('@jccschools.net')) {
         document.getElementById('errorMessage').innerText = 'Sorry, your email must end with @jccschools.net';
+        return;
+      }
+
+      // Basic password check (optional)
+      if (password.length < 6) {
+        document.getElementById('errorMessage').innerText = 'Password must be at least 6 characters long.';
         return;
       }
 
@@ -120,7 +128,7 @@ button:hover {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ firstName, lastName, email })
+        body: JSON.stringify({ firstName, lastName, email, password }) // Send password in the request body
       });
 
       const data = await response.json();
