@@ -151,11 +151,7 @@
 
   <h1>Game Hub</h1>
 
-  <!-- Tab Buttons -->
-  <div class="tab-container">
-    <button class="tab-button active" onclick="showTab('games')">Games</button>
-    <button class="tab-button" onclick="showTab('entertainment')">Entertainment</button>
-  </div>
+
 
   <!-- Main Content -->
   <div id="mainContent" style="display: none;">
@@ -163,11 +159,11 @@
     <div id="games" class="tab-content">
       <div class="game-grid">
         <div class="game-card" onclick="requestPlaytime('Game 1')">
-          <img src="https://via.placeholder.com/120x80" alt="Game 1">
+          <img src="placeholder.png" alt="Game 1">
           <p>Game 1</p>
         </div>
         <div class="game-card" onclick="requestPlaytime('Game 2')">
-          <img src="https://via.placeholder.com/120x80" alt="Game 1">
+          <img src="placeholder.png" alt="Game 2">
           <p>Game 2</p>
         </div>
       </div>
@@ -188,81 +184,66 @@
     </div>
   </div>
 
-<script type="module">
-  // Import the functions you need from the Firebase SDKs
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
-
-  // Your Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyC3OKNqd-r8Hvsk8F7TxlAuNKI0--9bm4k",
-    authDomain: "lsug-a702f.firebaseapp.com",
-    projectId: "lsug-a702f",
-    storageBucket: "lsug-a702f.firebasestorage.app",
-    messagingSenderId: "217408526353",
-    appId: "1:217408526353:web:2273f6d96adc60814339b0",
-    measurementId: "G-06K8D9D3Y3"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);  // Initialize Firebase Authentication
-  const db = getFirestore(app);  // Initialize Firestore
-
-  // Check if the user is authenticated
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in
-      db.collection("students").doc(user.uid).get().then((doc) => {
-        if (doc.exists) {
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("mainContent").style.display = "block";
-        } else {
-          document.getElementById("loginModal").style.display = "flex";
-        }
-      });
-    } else {
-      // If no user is signed in, sign in anonymously
-      signInAnonymously(auth)
-        .then(() => {
-          console.log("Anonymous user signed in.");
-        })
-        .catch((error) => {
-          console.error("Error signing in anonymously:", error);
-        });
+  <script>
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days*24*60*60*1000));
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
     }
-  });
 
-  // Login function to save student name to Firestore
-  window.loginStudent = function() {
-    const name = document.getElementById("studentName").value;
-    if (name.trim() === "") return alert("Enter your name!");
+    // Function to get a cookie
+    function getCookie(name) {
+      const cookieArr = document.cookie.split("; ");
+      for (let i = 0; i < cookieArr.length; i++) {
+        const cookiePair = cookieArr[i].split("=");
+        if (name === cookiePair[0]) {
+          return decodeURIComponent(cookiePair[1]);
+        }
+      }
+      return null;
+    }
 
-    const user = auth.currentUser;
-    db.collection("students").doc(user.uid).set({
-      name: name,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+    // Function to check login status
+    function checkLogin() {
+      const studentName = getCookie("studentName");
+      if (studentName) {
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+      } else {
+        document.getElementById("loginModal").style.display = "flex";
+      }
+    }
+
+    // Login function
+    function loginStudent() {
+      const name = document.getElementById("studentName").value;
+      if (name.trim() === "") {
+        alert("Please enter your name!");
+        return;
+      }
+      // Set cookie for 7 days
+      setCookie("studentName", name, 7);
+      // Hide modal and show content
       document.getElementById("loginModal").style.display = "none";
       document.getElementById("mainContent").style.display = "block";
-    });
-  }
+    }
 
-  // Sidebar toggle function
-  window.toggleSidebar = function() {
-    document.getElementById("sidebar").classList.toggle("open-sidebar");
-  }
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open-sidebar");
+    }
 
-  // Function to show specific tabs
-  window.showTab = function(tabName) {
-    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
-    document.getElementById(tabName).classList.remove("hidden");
-  }
-</script>
+    // Show a tab based on user selection
+    function showTab(tabName) {
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
+      document.getElementById(tabName).classList.remove("hidden");
+    }
 
+    // Check if the user is logged in when the page loads
+    window.onload = checkLogin;
+  </script>
 
 </body>
 </html>
