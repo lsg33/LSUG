@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    .form-container {
+      margin-top: 50px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      margin: 0 auto;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Sign Up</h2>
+    <form id="signUpForm">
+      <input type="text" id="firstName" placeholder="First Name" required><br>
+      <input type="text" id="lastName" placeholder="Last Name" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p id="errorMessage" style="color:red;"></p>
+  </div>
+
+  <script>
+    document.getElementById('signUpForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+
+      // Email validation check
+      if (!email.endsWith('@certaindomail.com')) {
+        document.getElementById('errorMessage').innerText = 'Sorry, your email must end with @certaindomail.com';
+        return;
+      }
+
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ firstName, lastName, email })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert('Registration successful!');
+        window.location.href = '/login'; // Redirect to login page
+      } else {
+        document.getElementById('errorMessage').innerText = data.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
