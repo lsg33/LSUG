@@ -207,8 +207,8 @@
 
     // Function to check login status
     function checkLogin() {
-      const studentName = getCookie("studentName");
-      if (studentName) {
+      const loggedIn = getCookie("loggedIn");
+      if (loggedIn) {
         document.getElementById("loginModal").style.display = "none";
         document.getElementById("mainContent").style.display = "block";
       } else {
@@ -218,13 +218,7 @@
 
     // Login function
     function loginStudent() {
-      const name = document.getElementById("studentName").value;
-      if (name.trim() === "") {
-        alert("Please enter your name!");
-        return;
-      }
-      // Set cookie for 7 days
-      setCookie("studentName", name, 7);
+      
       // Hide modal and show content
       document.getElementById("loginModal").style.display = "none";
       document.getElementById("mainContent").style.display = "block";
