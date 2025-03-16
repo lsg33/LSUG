@@ -156,8 +156,8 @@
 
   <h1>Game Hub</h1>
 
-    <div class="content">
-      <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts" style="display: none;"></iframe>
+    <div class="content" style="display: none;">
+      <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts"></iframe>
     </div>
 
   <!-- Main Content -->
@@ -196,6 +196,13 @@
   </div>
 
   <script>
+
+
+    document.getElementById('crazyGames').onclick = function() {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        fetchData('https://crazygames.com');
+    };
     // Function to set a cookie
     function setCookie(name, value, days) {
       const d = new Date();
@@ -245,6 +252,87 @@
       document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
       document.getElementById(tabName).classList.remove("hidden");
     }
+
+      function fetchData(url) {
+            fetch(`https://cors-anywhere.herokuapp.com/${url}`, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const iframe = document.getElementById('resultFrame');
+                
+                // Clear existing content before writing new content
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(data);
+                iframe.contentWindow.document.close();
+
+                // Only attach the observer once
+                if (!iframe.dataset.observerAttached) {
+                    observeIframe(); // Attach observer after iframe content is written
+                    iframe.dataset.observerAttached = 'true'; // Mark as attached
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+        }
+
+
+
+
+
+        function observeIframe() {
+            const iframe = document.getElementById('resultFrame');
+            
+            // Function to add event listeners to links
+            const addLinkEventListeners = () => {
+                const links = iframe.contentWindow.document.querySelectorAll('a');
+                links.forEach(link => {
+                    // Check if the event listener has already been added
+                    if (!link.dataset.listenerAdded) {
+                        link.addEventListener('click', event => {
+                            event.preventDefault();
+                            fetchData(link.href);
+                            
+                        });
+                        // Mark the listener as added
+                        link.dataset.listenerAdded = 'true';
+                    }
+                });
+            };
+
+            const observer = new MutationObserver(() => {
+                addLinkEventListeners(); // Add event listeners on mutation
+            });
+
+            observer.observe(iframe.contentWindow.document, { childList: true, subtree: true });
+        }
+
+        // Call observeIframe when the iframe is loaded
+        document.getElementById('resultFrame').addEventListener('load', observeIframe);
+
+        // Handle messages from the iframe
+        
+        window.addEventListener('message', function(event) {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+            const newUrl = event.data;
+            fetchData(newUrl);
+        });
 
     // Check if the user is logged in when the page loads
     window.onload = checkLogin;
