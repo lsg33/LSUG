@@ -623,13 +623,14 @@ async function fetchFromCohere(prompt) {
 
 
 
-    async function typeOutText(elementId, responseText) {
+async function typeOutText(elementId, responseText) {
     const element = document.getElementById(elementId);
-    const sendButton = document.getElementById('submitButton');
+    const sendButton = document.getElementById('submit-btn'); // Assuming the button has an ID 'send-button'
     let index = 0;
     let formattedText = '';
     let isBulletList = false; // Track whether we're inside a bullet point list
 
+    // Disable the send button
     sendButton.disabled = true;
 
     function typeNextChar() {
@@ -673,12 +674,15 @@ async function fetchFromCohere(prompt) {
                 formattedText += '</ul>'; // Close the unordered list if still open at the end
                 isBulletList = false;
             }
-              sendButton.disabled = false;
+
+            // Enable the send button after typing is finished
+            sendButton.disabled = false;
         }
     }
 
     typeNextChar();
 }
+
 
 
 
