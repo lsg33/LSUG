@@ -25,10 +25,15 @@
             display: flex;
             flex-direction: column;
     }
-        iframe {
-            flex-grow: 1;
-            border: none;
-        }
+    /* Make iframe take the full width and height of the viewport */
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none; /* Optional: Remove default iframe border */
+    }
     .sidebar {
       width: 250px;
       height: 100%;
