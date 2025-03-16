@@ -204,6 +204,15 @@
 
   <script>
 
+        document.addEventListener('keydown', function(event) { 
+            if (event.ctrlKey && event.key === 'p') 
+            {
+                event.preventDefault(); 
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.getElementById('content').style.display = 'none';
+                } 
+            });
+
 
     document.getElementById('crazyGames').onclick = function() {
         document.getElementById('mainContent').style.display = 'none';
