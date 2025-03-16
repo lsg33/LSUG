@@ -555,60 +555,67 @@
         await fetchFromCohere(prompt);
     }
 
-    async function fetchFromCohere(prompt) {
-        try {
-            // Create a new AI response container
-            const aiResponseContainer = document.createElement('div');
-            aiResponseContainer.classList.add('chat-message', 'ai-response');
+   let chatHistory = []; // Initialize a global chat history variable
 
-            // Add the typing indicator and spinner
-            const aiResponseMessage = document.createElement('div');
-            aiResponseMessage.innerHTML = `<span>Mike is typing...</span> <img class="spinner" src="https://i.imgur.com/2qArcIN.png" alt="spinner">`;
-            aiResponseContainer.appendChild(aiResponseMessage);
+async function fetchFromCohere(prompt) {
+    try {
+        // Create a new AI response container
+        const aiResponseContainer = document.createElement('div');
+        aiResponseContainer.classList.add('chat-message', 'ai-response');
 
-            // Append the AI response container to the chatbox
-         
-            chatBox.appendChild(aiResponseContainer);
-            scrollToBottom();
+        // Add the typing indicator and spinner
+        const aiResponseMessage = document.createElement('div');
+        aiResponseMessage.innerHTML = `<span>Mike is typing...</span> <img class="spinner" src="https://i.imgur.com/2qArcIN.png" alt="spinner">`;
+        aiResponseContainer.appendChild(aiResponseMessage);
 
-            const response = await fetch('https://api.cohere.ai/v1/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer HpFyklLbzXgEX1dABIEPeXNdI9FoYaHUrLU67qwG', // Replace with your API key
-                },
-                body: JSON.stringify({
-                    model: "command-nightly", // or the model you're using
-                    query: prompt,
-                    max_tokens: 750,
-                    temperature: 0.7,
-                    chat_history: []
-                })
-            });
+        // Append the AI response container to the chatbox
+        chatBox.appendChild(aiResponseContainer);
+        scrollToBottom();
 
-            // Check response status
-            if (response.status !== 200) {
-                console.error("API request failed with status:", response.status);
-                aiResponseMessage.innerHTML = "Error: " + response.statusText;
-                return;
-            }
+        // Add the user message to chat history
+        chatHistory.push({ role: "user", content: prompt });
 
-            // Parse the response
-            let rawData = await response.json();
-            let responseText = rawData.text;
+        const response = await fetch('https://api.cohere.ai/v1/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer HpFyklLbzXgEX1dABIEPeXNdI9FoYaHUrLU67qwG', // Replace with your API key
+            },
+            body: JSON.stringify({
+                model: "command-nightly", // or the model you're using
+                query: prompt,
+                max_tokens: 750,
+                temperature: 0.7,
+                chat_history: chatHistory // Send the full chat history
+            })
+        });
 
-            responseText = formatResponse(responseText);
-          
-            // Remove spinner and show AI response
-            aiResponseMessage.innerHTML = `<span>Mike:</span> <span id="ai-typed-text-${Date.now()}"></span>`;
-            await typeOutText(`ai-typed-text-${Date.now()}`, responseText);
-           
-            scrollToBottom();
-        } catch (error) {
-            console.error('Error contacting Cohere API:', error);
-            aiResponseMessage.innerHTML = "Error retrieving response from Cohere.";
+        // Check response status
+        if (response.status !== 200) {
+            console.error("API request failed with status:", response.status);
+            aiResponseMessage.innerHTML = "Error: " + response.statusText;
+            return;
         }
+
+        // Parse the response
+        let rawData = await response.json();
+        let responseText = rawData.text;
+
+        responseText = formatResponse(responseText);
+      
+        // Add the AI response to chat history
+        chatHistory.push({ role: "ai", content: responseText });
+
+        // Remove spinner and show AI response
+        aiResponseMessage.innerHTML = `<span>Mike:</span> <span id="ai-typed-text-${Date.now()}"></span>`;
+        await typeOutText(`ai-typed-text-${Date.now()}`, responseText);
+      
+        scrollToBottom();
+    } catch (error) {
+        console.error('Error contacting Cohere API:', error);
+        aiResponseMessage.innerHTML = "Error retrieving response from Cohere.";
     }
+}
 
 
 
