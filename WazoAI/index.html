@@ -625,9 +625,12 @@ async function fetchFromCohere(prompt) {
 
     async function typeOutText(elementId, responseText) {
     const element = document.getElementById(elementId);
+    const sendButton = document.getElementById('submitButton');
     let index = 0;
     let formattedText = '';
     let isBulletList = false; // Track whether we're inside a bullet point list
+
+    sendButton.disabled = true;
 
     function typeNextChar() {
         if (index < responseText.length) {
@@ -670,6 +673,7 @@ async function fetchFromCohere(prompt) {
                 formattedText += '</ul>'; // Close the unordered list if still open at the end
                 isBulletList = false;
             }
+              sendButton.disabled = false;
         }
     }
 
