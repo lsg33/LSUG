@@ -69,11 +69,13 @@
       background: #0056b3;
     }
     .game-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
       padding: 20px;
     }
+
      .game-card {
       background: white;
       padding: 20px; /* Increase padding */
@@ -155,7 +157,7 @@
   <h1>Game Hub</h1>
 
     <div class="content">
-        <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts"></iframe>
+      <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts" style="display: none;"></iframe>
     </div>
 
   <!-- Main Content -->
