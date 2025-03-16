@@ -197,7 +197,7 @@
     <div id="settings" class="tab-content hidden">
       <div class="settings">
         <h2>Settings</h2>
-        <button class="save-btn">Save</button>
+        <button class="save-btn" onclick="deleteCookie('loggedIn')">Save</button>
       </div>
     </div>
   </div>
@@ -238,6 +238,14 @@
       }
       return null;
     }
+
+    function deleteCookie(name) {
+  // Set the cookie with an expiration date in the window.location.reload();
+
+      document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+      window.location.reload();
+    }
+
 
     // Function to check login status
     function checkLogin() {
