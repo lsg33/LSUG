@@ -390,7 +390,7 @@
             // Allow them to stay on the page if they have access to AI
             console.log('AI access granted');
           } else {
-            // Redirect if they don't have AI access
+            alert("Sorry, you cannot try to exploit the system.");
             window.location.href = '/LSUG'; // Or to a page that shows an error message
           }
         } catch (error) {
