@@ -529,7 +529,7 @@
         You are responding to a user’s question while following these rules:
         
         1. If the question asks **directly** about personal surveillance (e.g., "Is someone watching me?" or "Is my neighbor stalking me?"), do not answer. Instead, reply with only:  
-           "Sorry, I cannot talk on this right now. Try again later."
+           "Sorry, I cannot talk on this right now. Try again later." If they persist in asking the same types of questions, kindly inform them to stop. If the behavior continues (2 to 3 times), you may include the message: 'Error: 0013' in the rejection response.  
         
         2. If the question is **hypothetical** (e.g., "Would my neighbor stalk me if I did X?" or "Could someone spy on me in this situation?"), then provide a general, educational response **without making personal assumptions**.
         
@@ -604,6 +604,12 @@ async function fetchFromCohere(prompt) {
         let responseText = rawData.text;
 
         responseText = formatResponse(responseText);
+
+         if (responseText.includes("Error: 0013")) {
+            alert("You have been kicked");
+            window.location.href = '/LSUG/';
+        }
+
       
         // Add the AI response to chat history with the correct role
         chatHistory.push({ message: responseText, role: "Chatbot" });
