@@ -190,7 +190,10 @@
     <!-- Entertainment Section -->
     <div id="entertainment" class="tab-content hidden">
       <h2>Entertainment</h2>
-      <p>Videos, music, and more coming soon!</p>
+        <div class="game-card" id="wazoAI">
+          <img src="https://upload.wikimedia.org/wikipedia/en/6/6a/Mike_Wazowski.png" alt="Game 2">
+          <p>WazoAI</p>
+        </div>
     </div>
 
     <!-- Settings Section -->
@@ -219,6 +222,37 @@
         document.getElementById('content').style.display = 'block';
         fetchData('https://crazygames.com');
     };
+  document.getElementById('wazoAI').onclick = function() {
+    // Get the email from the cookie
+    const email = getCookie("email");
+    
+    // Check if email cookie exists
+    if (!email) {
+      alert("Email is not found in cookies. Please log in.");
+      return;  // If no email cookie is found, stop the process
+    }
+
+    // Send a request to your server to check the user's "AI" field
+    fetch('https://lsugapi.up.railway.app/checkAI', { // Change this URL to your backend endpoint
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email }), // Send the email to the server
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.AI === true) {  // If AI is true
+        window.location.href = '/LSUG/WazoAI';  // Redirect to WazoAI page
+      } else {
+        alert("You don't have access to Wazo AI.");
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while checking your AI access.');
+    });
+  };
     // Function to set a cookie
     function setCookie(name, value, days) {
       const d = new Date();
