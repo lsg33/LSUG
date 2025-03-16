@@ -74,19 +74,22 @@
       gap: 20px;
       padding: 20px;
     }
-    .game-card {
+     .game-card {
       background: white;
-      padding: 15px;
+      padding: 20px; /* Increase padding */
       text-align: center;
       border-radius: 8px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       cursor: pointer;
+      width: 180px; /* Increase the card width */
     }
+    
     .game-card img {
-      width: 120px;
-      height: 80px;
+      width: 150px; /* Increase image width */
+      height: 100px; /* Increase image height */
       border-radius: 5px;
     }
+
     .hidden {
       display: none;
     }
@@ -151,20 +154,26 @@
 
   <h1>Game Hub</h1>
 
-
+    <div class="content">
+        <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts"></iframe>
+    </div>
 
   <!-- Main Content -->
   <div id="mainContent" style="display: none;">
     <!-- Games Section -->
     <div id="games" class="tab-content">
       <div class="game-grid">
-        <div class="game-card" onclick="requestPlaytime('Game 1')">
-          <img src="placeholder.png" alt="Game 1">
-          <p>Game 1</p>
+        <div class="game-card" onclick="requestPlaytime('Game 2')">
+          <img src="https://files.crazygames.com/assets/2022/PNG/Ziggy_Default.png" alt="Game 2">
+          <p>Crazy Games</p>
         </div>
         <div class="game-card" onclick="requestPlaytime('Game 2')">
-          <img src="placeholder.png" alt="Game 2">
-          <p>Game 2</p>
+          <img src="https://files.crazygames.com/assets/2022/PNG/Ziggy_Default.png" alt="Game 2">
+          <p>Crazy Games</p>
+        </div>
+        <div class="game-card" onclick="requestPlaytime('Game 2')">
+          <img src="https://files.crazygames.com/assets/2022/PNG/Ziggy_Default.png" alt="Game 2">
+          <p>Crazy Games</p>
         </div>
       </div>
     </div>
