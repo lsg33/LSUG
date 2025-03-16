@@ -368,37 +368,39 @@
       return null;
     }
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        const userEmail = getCookie("email"); // Assuming you store the user's email locally after login
-      
-      if (!userEmail) {
-        // If no email is found in localStorage, redirect them to the login page
-        window.location.href = '/login'; 
+     document.addEventListener("DOMContentLoaded", async () => {
+  const userEmail = getCookie("email"); // Assuming you store the user's email locally after login
+
+  if (!userEmail) {
+    // If no email is found in localStorage, redirect them to the login page
+    window.location.href = '/login'; 
+  } else {
+    try {
+      const response = await fetch('https://lsugapi.up.railway.app/checkAI', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const data = await response.json();
+
+      if (data.AI) {
+        // Allow them to stay on the page if they have access to AI
+        console.log('AI access granted');
       } else {
-        try {
-          const response = await fetch('https://lsugapi.up.railway.app/checkAI', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: userEmail }),
-          });
-
-          const data = await response.json();
-
-          if (data.AI) {
-            // Allow them to stay on the page if they have access to AI
-            console.log('AI access granted');
-          } else {
-            alert("Sorry, you cannot try to exploit the system.");
-            window.location.href = '/LSUG'; // Or to a page that shows an error messag
-        } catch (error) {
-          console.error('Error checking AI access:', error);
-          // Redirect in case of any error
-          window.location.href = '/LSUG';
-        }
+        alert("Sorry, you cannot try to exploit the system.");
+        window.location.href = '/LSUG'; // Or to a page that shows an error message
       }
-    });
+    } catch (error) {
+      console.error('Error checking AI access:', error);
+      // Redirect in case of any error
+      window.location.href = '/LSUG';
+    }
+  }
+});
+
     
     const imageUpload = document.getElementById('image-upload');
     const imagePreview = document.getElementById('image-preview');
