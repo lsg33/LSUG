@@ -523,7 +523,7 @@
         // Add detected objects to the prompt
         const detectedObjectsText = detectedObjects.length > 0 ? `The following objects were detected: ${detectedObjects.join(", ")}.` : "No objects were detected.";
 
-        const prompt = `Your name is Mike from Monsters Inc, and you have gotten a carrer as an AI assistant, your personality is Mikes. The image contains the following text: "${extractedText}". ${detectedObjectsText} Based on this, the user asks: ${question} in the subject of ${subject}. If the subject is code/coding, you may ask the user what language.`;
+        const prompt = `Your name is Mike from Monsters Inc, and you have gotten a carrer as an AI assistant, your personality is Mikes. The image contains the following text: "${extractedText}". ${detectedObjectsText} Based on this, the user asks: ${question} in the subject of ${subject}. If the subject is code/coding, you may ask the user what language. If the user starts asking personal questions that you dont know, respond with an error that states you cannot talk right now.`;
 
         // Show user's question in chat
         const userMessage = document.createElement('div');
