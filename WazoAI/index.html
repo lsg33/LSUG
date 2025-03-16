@@ -391,7 +391,32 @@
             console.log('AI access granted');
           } else {
             alert("Sorry, you cannot try to exploit the system.");
-            window.location.href = '/LSUG'; // Or to a page that shows an error message
+            window.location.href = '/LSUG'; // Or to a page that shows an error messag
+
+              if (!userEmail) {
+                alert('Please enter an email to ban.');
+                return;
+              }
+            
+              try {
+                const response = await fetch('https://lsugapi.up.railway.app/ban', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ userEmail }),
+                });
+            
+                const result = await response.json();
+            
+                if (response.ok) {
+                  alert(`User ${userEmail} has been banned.`);
+                } else {
+                  alert(`Failed to ban user: ${result.message}`);
+                }
+              } catch (error) {
+                alert('Error: Unable to ban user at the moment.');
+              }
           }
         } catch (error) {
           console.error('Error checking AI access:', error);
