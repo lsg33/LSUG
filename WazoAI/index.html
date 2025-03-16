@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mike - Assesment Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        /* Spinner for AI response loading */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #333;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Ensure the body takes full viewport height */
+            background-color: #f5f5f5;
+            overflow: hidden;
+            margin: 0; /* Remove any default body margins */
+        }
+
+
+        #chat-container {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+           
+        }
+
+        
+ /* Chat Box */
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #fafafa;
+            overflow-y: auto; /* Add vertical scrollbar when content overflows */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px solid #ccc;
+            padding-bottom: 100px;
+            padding-top: 60px /* Increase bottom padding to the height of the input container */
+        }
+
+
+
+        .chat-message {
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 75%;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .chat-wrapper {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            height: calc(100vh - 60px); /* Adjust height, leaving space for the input box */
+        }
+
+        .user-message {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+        }
+
+        .ai-response {
+            background-color: #e3e4e8;
+            align-self: flex-start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: absolute;
+            right: -350px;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        select, input[type="file"] {
+            width: 100%;
+            border-radius: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .data-wrapper {
+    margin-top: 20px;
+    background-color: #f1f1f1;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    height: auto;  /* Let the wrapper grow dynamically */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;  /* Add space between elements */
+}
+
+#extracted-text {
+    flex-grow: 1;
+    margin-top: 10px;
+    height: auto;
+    resize: none;
+    width: 100%;  /* Ensure it takes full width */
+}
+
+#image-preview {
+    max-width: 100%;  /* Prevent image from exceeding the container's width */
+    max-height: 200px;  /* Ensure a reasonable image size */
+    object-fit: contain;  /* Maintain aspect ratio */
+    border-radius: 10px;
+    display: block;
+    margin-top: 10px;
+}
+
+
+
+        .sidebar label {
+            font-weight: bold;
+        }
+
+        /* Centered Input Form */
+        .input-container {
+            width: 80%;
+            max-width: 500px;
+            padding: 10px 15px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .input-container textarea {
+            width: 100%;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            padding: 12px;
+            font-size: 16px;
+            resize: none;
+            height: 60px;
+        }
+
+        .input-container button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .input-container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .input-container button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
+        /* Detected Objects Section */
+        #detected-objects {
+            margin-top: 20px;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .object-message {
+            font-size: 14px;
+            padding: 5px;
+            margin-bottom: 8px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+     /* Hamburger Button */
+        #hamburger-btn {
+            position: fixed; /* Change from absolute to fixed */
+            top: 5px;
+            right: 20px;
+            z-index: 1000; /* Ensure the button stays on top */
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+
+        #hamburger-btn span {
+            width: 30px;
+            height: 5px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+
+        /* Moving Hamburger Button with Sidebar */
+        .sidebar.open + #hamburger-btn {
+            right: 350px; /* Align hamburger with the sidebar */
+        }
+
+        /* Adjusting the chat container when sidebar is open */
+        .sidebar.open ~ #chat-container .chat-box {
+            margin-right: 350px; /* Shift the chat-box to make room for the sidebar */
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+        animation: shake 0.5s ease-in-out;
+        }
+
+        /* Styling for special formatting */
+        .instruction {
+            color: #FF5733; /* Or any color you want for the instructions */
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .emphasized {
+            font-weight: bold;
+            color: #007BFF; /* Color for emphasized text */
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Hamburger Button -->
+<button id="hamburger-btn" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<div id="chat-container">
+    <!-- Chat Box -->
+    <div class="chat-box" id="chat-box">
+        <!-- Chat messages will be dynamically inserted here -->
+    </div>
+
+    <!-- Sidebar for Inputs and Image -->
+    <div class="sidebar" id="sidebar">
+        <div class="input-wrapper">
+            <label for="subject-select">Select a subject</label>
+            <select id="subject-select">
+                <option value="" disabled selected>Select a subject</option>
+                <option value="Math">Math</option>
+                <option value="English">English</option>
+                <option value="Science">Science</option>
+                <option value="History">History</option>
+                <option value="Coding">Code</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <input type="file" id="image-upload" accept="pdf image/*">
+
+        <div class="input-wrapper">
+            <div class="data-wrapper">
+                <label for="extracted-text" style="text-align: center;">Extracted Data</label>
+
+                <div id="img-prev">
+                    <input type="text" id="extracted-text" accept="text" placeholder="Extracted text will appear here" disabled>
+                        
+                    <img id="image-preview" src="" alt="Image Preview" style="display:none;">
+                </div>
+
+                <div id="detected-objects">
+                    <h4>Detected Objects:</h4>
+                    <div id="detected-objects-list"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Centered Input Container -->
+<div class="input-container">
+    <textarea id="question" placeholder="Ask your question..."></textarea>
+    <button id="submit-btn" onclick="submitToAI()" disabled>Send</button>
+</div>
+
+<script>
+    const imageUpload = document.getElementById('image-upload');
+    const imagePreview = document.getElementById('image-preview');
+    const extractedTextArea = document.getElementById('extracted-text');
+    const subjectSelect = document.getElementById('subject-select');
+    const submitButton = document.getElementById('submit-btn');
+    const chatBox = document.getElementById('chat-box');
+    const questionInput = document.getElementById('question');
+    const detectedObjectsList = document.getElementById('detected-objects-list');
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    let cocoModel;
+    let detectedObjects = [];
+
+    // Enable submit button once a subject is selected
+    subjectSelect.addEventListener('change', function() {
+        submitButton.disabled = false;
+    });
+
+    // Load the COCO-SSD model (pre-trained object detection model)
+    async function loadModel() {
+        cocoModel = await cocoSsd.load();
+        console.log('COCO-SSD model loaded');
+    }
+
+    // Load the model when the page loads
+    window.onload = loadModel;
+
+    // Image preview on upload
+    imageUpload.onchange = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        imagePreview.src = "";
+        imagePreview.style.display = "none";
+        detectedObjectsList.innerHTML = "";
+        
+        // Handle PDF file
+        if (fileExtension === 'pdf') {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const typedarray = new Uint8Array(e.target.result);
+
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                    let textContent = '';
+                    let pagesProcessed = 0;
+
+                    // Loop through all pages of the PDF
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        pdf.getPage(pageNum).then(function(page) {
+                            page.getTextContent().then(function(text) {
+                                textContent += text.items.map(item => item.str).join(' ') + ' ';
+                                pagesProcessed++;
+
+                                // After processing all pages, display the extracted text
+                                if (pagesProcessed === pdf.numPages) {
+                                    extractedTextArea.value = textContent;
+                                }
+                            });
+                        });
+                    }
+                }).catch(function(error) {
+                    extractedTextArea.value = "Error extracting PDF text.";
+                    console.error("Error extracting PDF:", error);
+                });
+            };
+
+            reader.readAsArrayBuffer(file);
+        } 
+
+        // Handle image files (JPG, PNG, JPEG)
+        else if (['jpg', 'png', 'jpeg'].includes(fileExtension)) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = "block";
+
+                // Start text extraction using Tesseract.js
+                Tesseract.recognize(e.target.result, 'eng', {
+                    logger: info => console.log(info) // Optional: log progress
+                }).then(({ data: { text } }) => {
+                    extractedTextArea.value = text; // Display extracted text
+                }).catch(error => {
+                    extractedTextArea.value = "Error in extracting text.";
+                    console.error('Error:', error);
+                });
+
+                // Detect objects in the image
+                detectObjectsInImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        } 
+        else {
+            alert("Unsupported file type. Please upload a PDF or an image file.");
+        }
+    }
+};
+    async function submitToAI() {
+        const question = questionInput.value;
+        const extractedText = extractedTextArea.value;
+        const subject = subjectSelect.value;
+
+        if ((!question) || (subject !== "Other" && !extractedText) || question === "") {
+            // Handle the case where the question is missing, or extractedText is required but missing
+            console.error("Error: Missing information. Please provide all necessary inputs.");
+            //alert("Please upload an image or provide text for subjects other than 'Other'.");
+
+                const element = document.getElementById('submit-btn');
+                element.classList.add('shake');
+                element.style.backgroundColor = "red";
+
+                // Remove the class after animation ends so it can be triggered again
+                element.addEventListener('animationend', () => {
+                    element.classList.remove('shake');
+                    element.style.backgroundColor = "green";
+                });
+            return;
+        }
+
+        // Add detected objects to the prompt
+        const detectedObjectsText = detectedObjects.length > 0 ? `The following objects were detected: ${detectedObjects.join(", ")}.` : "No objects were detected.";
+
+        const prompt = `Your name is Mike from Monsters Inc, and you have gotten a carrer as an AI assistant, your personality is Mikes. The image contains the following text: "${extractedText}". ${detectedObjectsText} Based on this, the user asks: ${question} in the subject of ${subject}. If the subject is code/coding, you may ask the user what language.`;
+
+        // Show user's question in chat
+        const userMessage = document.createElement('div');
+        userMessage.classList.add('chat-message', 'user-message');
+        userMessage.innerHTML = `<span>You:</span> ${question}`;
+        chatBox.appendChild(userMessage);
+
+        questionInput.value = "";
+
+        // Call fetchFromCohere here
+        await fetchFromCohere(prompt);
+    }
+
+    async function fetchFromCohere(prompt) {
+        try {
+            // Create a new AI response container
+            const aiResponseContainer = document.createElement('div');
+            aiResponseContainer.classList.add('chat-message', 'ai-response');
+
+            // Add the typing indicator and spinner
+            const aiResponseMessage = document.createElement('div');
+            aiResponseMessage.innerHTML = `<span>Mike is typing...</span> <img class="spinner" src="https://i.imgur.com/2qArcIN.png" alt="spinner">`;
+            aiResponseContainer.appendChild(aiResponseMessage);
+
+            // Append the AI response container to the chatbox
+         
+            chatBox.appendChild(aiResponseContainer);
+            scrollToBottom();
+
+            const response = await fetch('https://api.cohere.ai/v1/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer HpFyklLbzXgEX1dABIEPeXNdI9FoYaHUrLU67qwG', // Replace with your API key
+                },
+                body: JSON.stringify({
+                    model: "command-nightly", // or the model you're using
+                    query: prompt,
+                    max_tokens: 750,
+                    temperature: 0.7,
+                    chat_history: []
+                })
+            });
+
+            // Check response status
+            if (response.status !== 200) {
+                console.error("API request failed with status:", response.status);
+                aiResponseMessage.innerHTML = "Error: " + response.statusText;
+                return;
+            }
+
+            // Parse the response
+            let rawData = await response.json();
+            let responseText = rawData.text;
+
+            responseText = formatResponse(responseText);
+          
+            // Remove spinner and show AI response
+            aiResponseMessage.innerHTML = `<span>Mike:</span> <span id="ai-typed-text-${Date.now()}"></span>`;
+            await typeOutText(`ai-typed-text-${Date.now()}`, responseText);
+           
+            scrollToBottom();
+        } catch (error) {
+            console.error('Error contacting Cohere API:', error);
+            aiResponseMessage.innerHTML = "Error retrieving response from Cohere.";
+        }
+    }
+
+
+
+    async function typeOutText(elementId, responseText) {
+    const element = document.getElementById(elementId);
+    let index = 0;
+    let formattedText = '';
+    let isBulletList = false; // Track whether we're inside a bullet point list
+
+    function typeNextChar() {
+        if (index < responseText.length) {
+            const char = responseText.charAt(index);
+
+            if (char === ':') {
+                // If line starts with ":", treat it as a special instruction
+                formattedText += `<span class="instruction">${char}</span>`;
+            } else if (char === '*' && responseText.charAt(index + 1) === '*') {
+                // If '**' is found, handle bold text
+                let endIndex = responseText.indexOf('**', index + 2);
+                if (endIndex !== -1) {
+                    let emphasizedText = responseText.substring(index + 2, endIndex);
+                    formattedText += `<strong class="emphasized">${emphasizedText}</strong>`;
+                    index = endIndex + 1; // Skip past the '**'
+                }
+            } else if (char === '\n') {
+                // Handle line breaks explicitly
+                formattedText += '<br>';
+                if (isBulletList) {
+                    formattedText += '</li>'; // Close the list item when a new line is encountered
+                }
+            } else if (char === '-' && responseText.charAt(index + 1) === ' ') {
+                // If '-' is followed by a space, also treat it as a bullet point (alternative syntax)
+                if (!isBulletList) {
+                    formattedText += '<ul>';
+                    isBulletList = true;
+                }
+                formattedText += '<li>';
+            } else {
+                // Add regular character
+                formattedText += char;
+            }
+
+            element.innerHTML = formattedText;
+            index++;
+            setTimeout(typeNextChar, 50); // Delay between each character (50ms)
+        } else {
+            if (isBulletList) {
+                formattedText += '</ul>'; // Close the unordered list if still open at the end
+                isBulletList = false;
+            }
+        }
+    }
+
+    typeNextChar();
+}
+
+
+
+
+    function formatResponse(responseText) {
+        // Regex to format the response
+        responseText = responseText.replace(`/(\d+\.)\s([^\n]+)/g, "<strong>$1</strong> <em>$2</em>"`); // Format question numbers and their descriptions
+        responseText = responseText.replace(`/(Answer: [a-zA-Z]+)/g, "<strong>$1</strong>"`); // Make the answer bold
+        responseText = responseText.replace(`/(True|False)/g, "<strong><span style='color: green;'>$1</span></strong>"`); // Colorize 'True'
+        responseText = responseText.replace(`/([a-zA-Z0-9]+ [<>=!]+ [a-zA-Z0-9]+)/g, "<span style='color: blue;'>$1</span>"`); // Highlight operations
+
+        return responseText;
+    }
+
+
+
+    function scrollToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function detectObjectsInImage(imageDataUrl) {
+        // Create an image element to load the uploaded image
+        const imgElement = new Image();
+        imgElement.src = imageDataUrl;
+        
+        imgElement.onload = async () => {
+            const predictions = await cocoModel.detect(imgElement);
+            console.log(predictions);
+
+            // Clear any previous objects
+            detectedObjectsList.innerHTML = '';
+
+            predictions.forEach(prediction => {
+                detectedObjects.push(prediction.class);
+                const objectDiv = document.createElement('div');
+                objectDiv.classList.add('object-message');
+                objectDiv.innerText = `Detected: ${prediction.class} (${(prediction.score * 100).toFixed(2)}%)`; 
+                detectedObjectsList.appendChild(objectDiv);
+            });
+        };
+    }
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        // Move hamburger button when sidebar opens/closes
+        if (sidebar.classList.contains('open')) {
+            hamburgerBtn.style.right = '350px'; // Align it with the sidebar
+        } else {
+            hamburgerBtn.style.right = '20px'; // Return to top-right corner
+        }
+        chatBox.style.marginRight = sidebar.classList.contains('open') ? '350px' : '0';
+    }
+
+    document.getElementById("question").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            if (event.shiftKey) {
+                // Shift + Enter: Allow new line (default behavior)
+                return;
+            } else {
+                // Enter without Shift: Submit and prevent adding a new line
+                event.preventDefault(); // Prevents the default behavior of adding a new line
+                submitToAI();
+            }
+        }
+    });
+
+
+    function shakeElement() {
+        const element = document.getElementById('shakeElement');
+        element.classList.add('shake');
+
+        // Remove the class after animation ends so it can be triggered again
+        element.addEventListener('animationend', () => {
+            element.classList.remove('shake');
+        });
+    }
+
+</script>
+
+</body>
+</html>
