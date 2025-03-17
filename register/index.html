@@ -134,14 +134,14 @@
       const data = await response.json();
       if (data.success) {
         alert('Registration successful!');
-        window.location.href = '/LSUG/login'; // Redirect to login page
+        window.location.href = '/login'; // Redirect to login page
       } else {
         document.getElementById('errorMessage').innerText = data.message;
       }
     });
 
     function loginPage() {
-      window.location.href = '/LSUG/login';  // Redirect to the login page
+      window.location.href = '/login';  // Redirect to the login page
     }
   </script>
 
