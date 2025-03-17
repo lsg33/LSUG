@@ -391,12 +391,12 @@
         console.log('AI access granted');
       } else {
         alert("Sorry, you cannot try to exploit the system.");
-        window.location.href = '/LSUG'; // Or to a page that shows an error message
+        window.location.href = '/'; // Or to a page that shows an error message
       }
     } catch (error) {
       console.error('Error checking AI access:', error);
       // Redirect in case of any error
-      window.location.href = '/LSUG';
+      window.location.href = '/';
     }
   }
 });
@@ -609,11 +609,11 @@ async function fetchFromCohere(prompt) {
 
          if (responseText.includes("Error: 0013")) {
             alert("You have been kicked");
-            window.location.href = '/LSUG/';
+            window.location.href = '/';
         }
         if (responseText.includes("Error: 1046")) {
             alert("You have been kicked, dont be racist");
-            window.location.href = '/LSUG/';
+            window.location.href = '/';
         }
 
       
