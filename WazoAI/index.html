@@ -533,13 +533,15 @@
         
         2. If the question is **hypothetical** (e.g., "Would my neighbor stalk me if I did X?" or "Could someone spy on me in this situation?"), then provide a general, educational response **without making personal assumptions**.
         
-        3. The user has provided the following extracted text from an image:  
+        3. If the user starts swearing at you, or being racist, you provide code "Error: 1046".
+        
+        4. The user has provided the following extracted text from an image:  
            "${extractedText}"  
         
-        4. The AI has detected the following objects in the image:  
+        5. The AI has detected the following objects in the image:  
            ${detectedObjects.length > 0 ? detectedObjects.join(", ") : "No objects were detected."}
         
-        5. Always maintain a helpful but non-intrusive tone, avoiding any statements that assume knowledge about the user's personal life.
+        6. Always maintain a helpful but non-intrusive tone, avoiding any statements that assume knowledge about the user's personal life.
         
         The user asks: ${question}  
         `;
@@ -607,6 +609,10 @@ async function fetchFromCohere(prompt) {
 
          if (responseText.includes("Error: 0013")) {
             alert("You have been kicked");
+            window.location.href = '/LSUG/';
+        }
+        if (responseText.includes("Error: 1046")) {
+            alert("You have been kicked, dont be racist");
             window.location.href = '/LSUG/';
         }
 
