@@ -112,14 +112,14 @@
         document.cookie = `email=${email}; path=/; max-age=86400`; // Cookie for 1 day with the user's email
         
         alert('Login successful!');
-        window.location.href = '/LSUG'; // Redirect to the homepage after successful login
+        window.location.href = '/'; // Redirect to the homepage after successful login
       } else {
         document.getElementById('errorMessage').innerText = data.message;
       }
     });
 
     function goToSignupPage() {
-      window.location.href = '/LSUG/register'; // Redirect to the sign-up page
+      window.location.href = '/register'; // Redirect to the sign-up page
     }
   </script>
 
