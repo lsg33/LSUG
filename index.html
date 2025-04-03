@@ -199,6 +199,14 @@
             <img src="https://th.bing.com/th/id/OIP.fHpf_Vheh4D01GOH6xYfkwHaHa?rs=1&pid=ImgDetMain" alt="Game 2">
             <p>Netflix</p>
         </div>
+        <div class="game-card" id="youtube">
+            <img src="https://logos-world.net/wp-content/uploads/2020/04/YouTube-Logo-2017-present.jpg" alt="Game 2">
+            <p>Youtube</p>
+        </div>
+        <div class="game-card" id="tiktok">
+            <img src="https://th.bing.com/th/id/R.60d9ba4e518844d007771698e8fcca7e?rik=95Y%2fwnWtwXH4Fw&pid=ImgRaw&r=0" alt="Game 2">
+            <p>TikTok</p>
+        </div>
       </div>
     </div>
 
@@ -234,6 +242,19 @@
         document.getElementById('content').style.display = 'block';
         fetchData('https://netflix.com');
     };
+
+    document.getElementById('youtube').onclick = function() {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        fetchData('https://youtube.com');
+    };
+
+    document.getElementById('tiktok').onclick = function() {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        fetchData('https://tiktok.com');
+    };
+    
   document.getElementById('wazoAI').onclick = function() {
     // Get the email from the cookie
     const email = getCookie("email");
